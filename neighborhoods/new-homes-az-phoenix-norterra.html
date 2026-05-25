@@ -145,7 +145,7 @@
 
     <div class="container py-5">
         <h1 class="display-5 fw-bold mb-3">Norterra</h1>
-        <p class="text-muted">Loading community details&hellip;</p>
+        <p class="text-muted" id="community-status">Loading community details&hellip;</p>
 
         <div id="app-root" class="mt-5 p-5 bg-light rounded text-center">
             <div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading&hellip;</span></div>
@@ -165,5 +165,48 @@
     </div>
 
     <script src="../libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+    (function () {
+        var state = window.__INITIAL_STATE__;
+        if (!state || !state.community) return;
+
+        var community = state.community;
+        var gallery = community.salesGallery || {};
+        var address = [
+            gallery.streetAddress,
+            gallery.addressLocality + ', ' + gallery.addressRegion + ' ' + gallery.postalCode
+        ].filter(Boolean).join(', ');
+
+        var statusEl = document.getElementById('community-status');
+        if (statusEl) {
+            statusEl.textContent = community.status === 'selling'
+                ? 'Now selling in ' + (community.metro || 'Phoenix') + ', ' + (gallery.addressRegion || 'AZ')
+                : 'Community details';
+        }
+
+        var root = document.getElementById('app-root');
+        if (!root) return;
+
+        root.className = 'mt-5 p-4 p-md-5 bg-light rounded';
+        root.innerHTML =
+            '<div class="row g-4 text-start">' +
+                '<div class="col-md-6">' +
+                    '<h2 class="h4 mb-3">Sales Gallery</h2>' +
+                    '<p class="mb-1"><strong>' + gallery.streetAddress + '</strong></p>' +
+                    '<p class="mb-0 text-muted">' + gallery.addressLocality + ', ' + gallery.addressRegion + ' ' + gallery.postalCode + '</p>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                    '<h2 class="h4 mb-3">Community Overview</h2>' +
+                    '<ul class="list-unstyled mb-0">' +
+                        '<li class="mb-2"><strong>Homes available:</strong> ' + community.homesAvailable + '</li>' +
+                        '<li class="mb-2"><strong>Starting from:</strong> $' + community.priceFrom.toLocaleString() + '</li>' +
+                        '<li class="mb-2"><strong>Region:</strong> ' + community.builderRegion + '</li>' +
+                        '<li><strong>Status:</strong> ' + community.status + '</li>' +
+                    '</ul>' +
+                '</div>' +
+            '</div>' +
+            '<p class="text-muted small mt-4 mb-0">Sales gallery address: ' + address + '</p>';
+    })();
+    </script>
 </body>
 </html>
